@@ -1,0 +1,26 @@
+name: Publish Docker image
+on: push
+jobs:
+  push_to_registry:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Build shadow (fat) jar
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: shadowJar
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: hargettp/sheepit-client/sheepit
+          tag_with_ref: true
